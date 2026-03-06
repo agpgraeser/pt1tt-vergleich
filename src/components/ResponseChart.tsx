@@ -50,26 +50,40 @@ export default function ResponseChart({ state, computed }: Props) {
   // ── Top chart: Messdaten (Spalte 2) + Modellantworten ───────────────────────
   useEffect(() => {
     const div = topRef.current;
-    if (!div || state.timeData.length === 0) return;
+    if (!div) return;
 
-    const { timeData, xData, fileName, varNames } = state;
-    const { models } = computed;
+    const { timeData, xData, fileName, varNames, showExcelData } = state;
+    const { models, timeAxis } = computed;
 
-    const traceMeasured: Plotly.Data = {
-      x: timeData,
-      y: xData,
-      mode: 'lines',
-      name: varNames.x || 'Messwert',
-      line: { width: 2, color: 'blue' },
-    };
+    const hasExcel = showExcelData && timeData.length > 0;
+    const hasModels = models.length > 0;
 
-    const modelTraces: Plotly.Data[] = models.map(m => ({
-      x: timeData,
-      y: m.data,
-      mode: 'lines',
-      name: m.name,
-      line: { width: 2, color: MODEL_COLORS[m.index as 0 | 1 | 2 | 3] },
-    }));
+    if (!hasExcel && !hasModels) {
+      Plotly.purge(div);
+      return;
+    }
+
+    const traces: Plotly.Data[] = [];
+
+    if (hasExcel) {
+      traces.push({
+        x: timeData,
+        y: xData,
+        mode: 'lines',
+        name: varNames.x || 'Messwert',
+        line: { width: 2, color: 'blue' },
+      });
+    }
+
+    models.forEach(m => {
+      traces.push({
+        x: timeAxis,
+        y: m.data,
+        mode: 'lines',
+        name: m.name,
+        line: { width: 2, color: MODEL_COLORS[m.index as 0 | 1 | 2 | 3] },
+      });
+    });
 
     const layout: Partial<Plotly.Layout> = {
       title: {
@@ -83,7 +97,7 @@ export default function ResponseChart({ state, computed }: Props) {
       autosize: true,
     };
 
-    Plotly.react(div, [traceMeasured, ...modelTraces], layout, { responsive: true });
+    Plotly.react(div, traces, layout, { responsive: true });
   }, [state, computed]);
 
   // ── Bottom chart ─────────────────────────────────────────────────────────────

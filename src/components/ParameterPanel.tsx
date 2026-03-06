@@ -1,5 +1,5 @@
 import {
-  Box, Typography, Divider, TextField, Checkbox, FormControlLabel,
+  Box, Typography, Divider, TextField, Checkbox, FormControlLabel, Tooltip,
 } from '@mui/material';
 import type { Action } from '../store/reducer';
 import type { VergleichState } from '../types';
@@ -14,14 +14,15 @@ interface Props {
 // ── Inline helpers ────────────────────────────────────────────────────────────
 
 function NumInput({
-  value, onChange, error = false, step,
+  value, onChange, error = false, step, tooltip,
 }: {
   value: string;
   onChange: (v: string) => void;
   error?: boolean;
   step?: number;
+  tooltip?: string;
 }) {
-  return (
+  const field = (
     <TextField
       value={value}
       onChange={e => onChange(e.target.value)}
@@ -34,6 +35,11 @@ function NumInput({
       }}
     />
   );
+  return tooltip ? (
+    <Tooltip title={tooltip} placement="right" arrow>
+      <span>{field}</span>
+    </Tooltip>
+  ) : field;
 }
 
 function Lbl({ children }: { children: React.ReactNode }) {
@@ -68,7 +74,7 @@ const row6: React.CSSProperties = {
 // 4-column compact grid: label | input | label | input  (2 rows for 4 fields)
 const row4: React.CSSProperties = {
   display: 'grid',
-  gridTemplateColumns: 'auto 95px auto 95px',
+  gridTemplateColumns: 'max-content 95px max-content 95px',
   columnGap: '6px',
   rowGap: '4px',
   alignItems: 'center',
@@ -109,32 +115,44 @@ export default function ParameterPanel({ state, dispatch }: Props) {
         <Box sx={{ px: 2, pt: 2, pb: 1.5 }}>
           <SectionTitle>Eingangssignal</SectionTitle>
           <Box sx={row4}>
-            <Lbl>XA</Lbl>
+            <Tooltip title="Anfangswert der Sprungantwort" placement="right" arrow>
+              <span><Lbl>XA</Lbl></span>
+            </Tooltip>
             <NumInput
               value={state.XA}
               step={0.01}
               error={errors.XA}
+              tooltip="Anfangswert der Sprungantwort"
               onChange={v => setSignal('XA', v)}
             />
-            <Lbl>t₀</Lbl>
+            <Tooltip title="Zeitpunkt der Sprunganregung" placement="right" arrow>
+              <span><Lbl>t₀</Lbl></span>
+            </Tooltip>
             <NumInput
               value={state.t0}
               step={0.1}
               error={errors.t0}
+              tooltip="Zeitpunkt der Sprunganregung"
               onChange={v => setSignal('t0', v)}
             />
-            <Lbl>YA</Lbl>
+            <Tooltip title="Anfangswert der Stellgröße" placement="right" arrow>
+              <span><Lbl>YA</Lbl></span>
+            </Tooltip>
             <NumInput
               value={state.YA}
               step={0.01}
               error={errors.YA}
+              tooltip="Anfangswert der Stellgröße"
               onChange={v => setSignal('YA', v)}
             />
-            <Lbl>DY</Lbl>
+            <Tooltip title="Änderung der Stellgröße zum Zeitpunkt t₀" placement="right" arrow>
+              <span><Lbl>DY</Lbl></span>
+            </Tooltip>
             <NumInput
               value={state.DY}
               step={0.01}
               error={errors.DY}
+              tooltip="Änderung der Stellgröße zum Zeitpunkt t₀"
               onChange={v => setSignal('DY', v)}
             />
           </Box>
@@ -162,7 +180,7 @@ export default function ParameterPanel({ state, dispatch }: Props) {
                     }
                     label={
                       <Typography variant="subtitle2" fontWeight={600} sx={{ fontSize: '0.82rem' }}>
-                        {`System ${i + 1}`}
+                        {`Anzeige System ${i + 1}`}
                       </Typography>
                     }
                     sx={{ mr: 1, ml: 0 }}
@@ -171,36 +189,46 @@ export default function ParameterPanel({ state, dispatch }: Props) {
                     value={sys.name}
                     onChange={e => setSysStr(i, 'name', e.target.value)}
                     size="small"
-                    placeholder={`System ${i + 1}`}
+                    placeholder={`Sys ${i + 1}`}
                     disabled={!sys.enabled}
                     inputProps={{
-                      style: { fontSize: '0.82rem', padding: '5px 8px' },
+                      maxLength: 10,
+                      style: { fontSize: '0.82rem', padding: '5px 8px', width: '80px' },
                     }}
-                    sx={{ flex: 1 }}
+                    sx={{ width: 96 }}
                   />
                 </Box>
 
                 {/* KS | TT | TG */}
                 <Box sx={{ ...row6, opacity: sys.enabled ? 1 : 0.4 }}>
-                  <Lbl>KS</Lbl>
+                  <Tooltip title="Verstärkungsfaktor des Systems" placement="right" arrow>
+                    <span><Lbl>KS</Lbl></span>
+                  </Tooltip>
                   <NumInput
                     value={sys.KS}
                     step={0.01}
                     error={sysErrors.KS}
+                    tooltip="Verstärkungsfaktor des Systems"
                     onChange={v => setSysStr(i, 'KS', v)}
                   />
-                  <Lbl>TT</Lbl>
+                  <Tooltip title="Totzeit des Systems" placement="right" arrow>
+                    <span><Lbl>TT</Lbl></span>
+                  </Tooltip>
                   <NumInput
                     value={sys.TT}
                     step={0.1}
                     error={sysErrors.TT}
+                    tooltip="Totzeit des Systems"
                     onChange={v => setSysStr(i, 'TT', v)}
                   />
-                  <Lbl>TG</Lbl>
+                  <Tooltip title="Zeitkonstante des Systems" placement="right" arrow>
+                    <span><Lbl>TG</Lbl></span>
+                  </Tooltip>
                   <NumInput
                     value={sys.TG}
                     step={0.1}
                     error={sysErrors.TG}
+                    tooltip="Zeitkonstante des Systems"
                     onChange={v => setSysStr(i, 'TG', v)}
                   />
                 </Box>
@@ -212,7 +240,27 @@ export default function ParameterPanel({ state, dispatch }: Props) {
 
         {/* ── Section: Messdaten laden ── */}
         <Box sx={{ px: 2, py: 1.5 }}>
-          <SectionTitle>Messdaten laden</SectionTitle>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, gap: 1 }}>
+            <Typography variant="subtitle2" fontWeight={600} sx={{ fontSize: '0.82rem', flex: 1 }}>
+              Messdaten laden
+            </Typography>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={state.showExcelData}
+                  size="small"
+                  onChange={e => dispatch({ type: 'SET_SHOW_EXCEL_DATA', value: e.target.checked })}
+                  sx={{ p: 0.3 }}
+                />
+              }
+              label={
+                <Typography variant="body2" sx={{ fontSize: '0.82rem' }}>
+                  anzeigen
+                </Typography>
+              }
+              sx={{ mr: 0, ml: 0 }}
+            />
+          </Box>
           <ExcelImport state={state} dispatch={dispatch} />
         </Box>
       </Box>

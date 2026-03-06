@@ -42,6 +42,7 @@ export interface VergleichState {
   units: Units;
   fileName: string;
   excelPreviewRows: (string | number | undefined)[][];
+  showExcelData: boolean;
 }
 
 export interface ModelResult {
@@ -52,6 +53,7 @@ export interface ModelResult {
 
 export interface ComputedModels {
   models: ModelResult[];
+  timeAxis: number[];
 }
 
 export interface SystemErrors {

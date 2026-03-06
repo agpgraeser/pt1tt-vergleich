@@ -3,7 +3,8 @@ import type { VergleichState, ExcelParseResult, SystemParams } from '../types';
 export type Action =
   | { type: 'SET_SIGNAL_FIELD'; field: 'XA' | 't0' | 'YA' | 'DY'; value: string }
   | { type: 'SET_SYSTEM_FIELD'; index: 0 | 1 | 2 | 3; field: keyof SystemParams; value: string | boolean }
-  | { type: 'LOAD_EXCEL'; result: ExcelParseResult; fileName: string };
+  | { type: 'LOAD_EXCEL'; result: ExcelParseResult; fileName: string }
+  | { type: 'SET_SHOW_EXCEL_DATA'; value: boolean };
 
 function makeSystem(name: string, enabled: boolean): SystemParams {
   return { name, KS: '', TT: '', TG: '', enabled };
@@ -28,6 +29,7 @@ export const initialState: VergleichState = {
   units: { time: '', x: '', y: '' },
   fileName: '',
   excelPreviewRows: [],
+  showExcelData: true,
 };
 
 function updateSystem(
@@ -75,6 +77,9 @@ export function reducer(state: VergleichState, action: Action): VergleichState {
         fileName: action.fileName,
         excelPreviewRows: action.result.previewRows,
       };
+
+    case 'SET_SHOW_EXCEL_DATA':
+      return { ...state, showExcelData: action.value };
 
     default:
       return state;

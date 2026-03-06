@@ -7,6 +7,8 @@ Web-App zum Vergleich von PT1TT-Parametern aus verschiedenen Methoden.
 - **Visualisierung:** Plotly.js
 - **Excel-Import:** xlsx
 - **Start:** `npm run dev`
+- **Port freigeben** (falls Vite noch läuft): `lsof -ti tcp:5173 | xargs kill`
+  - Für mehrere Ports: `lsof -ti tcp:5173,5174,5175 | xargs kill`
 
 ## Projektstruktur
 ```
