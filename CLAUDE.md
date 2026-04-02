@@ -27,9 +27,11 @@ src/
 
 ## Git-Verlauf (Auszug)
 - Erste einsetzbare Version v1.0.0
+- Auslieferung V2: Tooltips, Excel-Checkbox, Sprungantwort ohne Excel, UI-Verbesserungen
 
 ## Verlauf Zusammenarbeit mit Claude
 - **2026-02-22:** CLAUDE.md angelegt
+- **2026-03-06:** Auslieferung V2 – Tooltips, Excel-Checkbox, Sprungantwort ohne Excel, Label-Abstände, System-Namensfeld
 
 ## Offene Punkte / Nächste Schritte
 - (hier eintragen was als nächstes gemacht werden soll)
